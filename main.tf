@@ -17,8 +17,8 @@ provider "aws" {
 #   cidr_block = "10.0.0.0/16"
 # }
 
-resource "aws_s3_bucket" "cat-1" {
-  bucket = "cat-1"
+resource "aws_s3_bucket" "cat" {
+  bucket = "cat-1-caca-pipi"
 
   tags = {
     Name        = "Cat-BDD"
