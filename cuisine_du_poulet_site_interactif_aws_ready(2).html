@@ -1,0 +1,727 @@
+<!doctype html>
+<html lang="fr" class="scroll-smooth">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cuisine du Poulet — Toutes les formes & saveurs</title>
+  <meta name="description" content="Un site interactif célébrant la cuisine du poulet : recettes, profils de saveurs, minuteurs de cuisson et créateur de marinade." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // Tailwind config
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'ui-sans-serif', 'system-ui'] },
+          colors: {
+            brand: {
+              50: '#fff7ed', 100: '#ffedd5', 200: '#fed7aa', 300: '#fdba74', 400: '#fb923c',
+              500: '#f97316', 600: '#ea580c', 700: '#c2410c', 800: '#9a3412', 900: '#7c2d12'
+            }
+          },
+          boxShadow: { soft: '0 10px 30px rgba(0,0,0,.08)' }
+        }
+      }
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    ::selection { background: #fdba74; color: #111827; }
+    .glass { backdrop-filter: blur(10px); background: rgba(255,255,255,.7); }
+    .dark .glass { background: rgba(17,24,39,.6); }
+  </style>
+</head>
+<body class="bg-stone-50 text-stone-800 dark:bg-stone-900 dark:text-stone-100">
+  <!-- Navbar -->
+  <header class="sticky top-0 z-50 border-b border-stone-200/60 dark:border-stone-700/60 bg-white/80 dark:bg-stone-900/70 glass">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <a href="#top" class="group inline-flex items-center gap-2">
+          <span class="inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-brand-500 text-white shadow-soft">
+            🍗
+          </span>
+          <div>
+            <p class="text-sm leading-none text-stone-500 dark:text-stone-400">Cuisine du</p>
+            <p class="font-extrabold tracking-tight text-lg -mt-0.5">Poulet</p>
+          </div>
+        </a>
+        <nav class="hidden md:flex items-center gap-6 text-sm">
+          <a href="#recettes" class="hover:text-brand-600">Recettes</a>
+          <a href="#marinade" class="hover:text-brand-600">Créateur de marinade</a>
+          <a href="#timers" class="hover:text-brand-600">Minuteurs</a>
+          <a href="#apropos" class="hover:text-brand-600">À propos</a>
+          <button id="darkToggle" class="ml-2 inline-flex items-center gap-2 rounded-xl border border-stone-200 dark:border-stone-700 px-3 py-1.5 hover:bg-stone-50 dark:hover:bg-stone-800" title="Mode sombre">
+            <span class="text-xs">Thème</span>
+            <span id="themeEmoji">🌞</span>
+          </button>
+        </nav>
+        <button id="menuBtn" class="md:hidden p-2 rounded-xl border border-stone-200 dark:border-stone-700" aria-label="Ouvrir le menu">☰</button>
+      </div>
+      <nav id="mobileNav" class="md:hidden hidden pb-4 space-y-2 text-sm">
+        <a href="#recettes" class="block">Recettes</a>
+        <a href="#marinade" class="block">Créateur de marinade</a>
+        <a href="#timers" class="block">Minuteurs</a>
+        <a href="#apropos" class="block">À propos</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-br from-brand-50 via-white to-transparent dark:from-stone-800 dark:via-stone-900 -z-10"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
+      <div class="grid md:grid-cols-2 gap-10 items-center">
+        <div>
+          <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight leading-tight">
+            Le poulet, <span class="text-brand-600">dans toutes ses formes</span> & saveurs
+          </h1>
+          <p class="mt-4 text-lg text-stone-600 dark:text-stone-300 max-w-prose">
+            Explorez des recettes du monde entier, ajustez les épices à votre goût, créez votre marinade parfaite et cuisinez avec des minuteurs intégrés.
+          </p>
+          <div class="mt-6 flex flex-wrap gap-3">
+            <a href="#recettes" class="inline-flex items-center gap-2 rounded-2xl bg-brand-600 text-white px-5 py-3 shadow-soft hover:bg-brand-700">Découvrir les recettes</a>
+            <a href="#marinade" class="inline-flex items-center gap-2 rounded-2xl border border-stone-300 dark:border-stone-700 px-5 py-3 hover:bg-stone-50 dark:hover:bg-stone-800">Créer une marinade</a>
+          </div>
+          <dl class="mt-10 grid grid-cols-3 gap-6 text-center">
+            <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+              <dt class="text-xs uppercase tracking-wide text-stone-500">Recettes</dt>
+              <dd class="text-2xl font-extrabold" id="statRecettes">—</dd>
+            </div>
+            <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+              <dt class="text-xs uppercase tracking-wide text-stone-500">Pays</dt>
+              <dd class="text-2xl font-extrabold" id="statPays">—</dd>
+            </div>
+            <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+              <dt class="text-xs uppercase tracking-wide text-stone-500">Temps moyen</dt>
+              <dd class="text-2xl font-extrabold" id="statTemps">—</dd>
+            </div>
+          </dl>
+        </div>
+        <div class="relative">
+          <div class="aspect-[4/3] rounded-3xl overflow-hidden shadow-soft ring-1 ring-stone-200 dark:ring-stone-700">
+            <img src="https://images.unsplash.com/photo-1550547660-d9450f859349?q=80&w=1600&auto=format&fit=crop" alt="Assortiment de plats de poulet" class="w-full h-full object-cover"/>
+          </div>
+          <div class="absolute -bottom-6 -left-6 bg-white dark:bg-stone-800 rounded-2xl shadow-soft p-4 ring-1 ring-stone-200 dark:ring-stone-700">
+            <p class="text-xs text-stone-500">Profil de saveurs</p>
+            <canvas id="heroChart" width="240" height="160" class="mt-2"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Recettes -->
+  <section id="recettes" class="py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <h2 class="text-3xl font-extrabold tracking-tight">Recettes du monde</h2>
+          <p class="text-stone-600 dark:text-stone-300">Filtrez par style, pays, temps et niveau d'épices.</p>
+        </div>
+        <div class="flex flex-wrap gap-3 w-full lg:w-auto">
+          <div class="relative grow lg:grow-0">
+            <input id="searchInput" type="search" placeholder="Rechercher une recette..." class="w-full lg:w-72 rounded-2xl border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500">
+            <span class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-stone-400">⌕</span>
+          </div>
+          <select id="styleFilter" class="rounded-2xl border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-4 py-2.5">
+            <option value="">Tous styles</option>
+            <option>Grillades</option>
+            <option>Frit</option>
+            <option>Curry</option>
+            <option>Rôti</option>
+            <option>Salade</option>
+            <option>Street food</option>
+          </select>
+          <select id="countryFilter" class="rounded-2xl border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-4 py-2.5">
+            <option value="">Tous pays</option>
+          </select>
+          <label class="inline-flex items-center gap-2 rounded-2xl border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-3 py-2.5">
+            <span class="text-sm">Épices</span>
+            <input id="spiceRange" type="range" min="0" max="10" step="1" value="10" class="w-32">
+            <span class="text-sm text-stone-500" id="spiceValue">≤ 10</span>
+          </label>
+          <label class="inline-flex items-center gap-2 rounded-2xl border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-3 py-2.5">
+            <input id="fastOnly" type="checkbox" class="rounded">
+            <span class="text-sm">≤ 30 min</span>
+          </label>
+        </div>
+      </div>
+
+      <div id="recipesGrid" class="mt-8 grid sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+      <p id="noResults" class="hidden mt-8 text-center text-stone-500">Aucun résultat avec ces filtres.</p>
+    </div>
+  </section>
+
+  <!-- Modale Recette -->
+  <div id="recipeModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/50">
+    <div class="w-full max-w-3xl bg-white dark:bg-stone-900 rounded-3xl shadow-soft ring-1 ring-stone-200 dark:ring-stone-700 overflow-hidden">
+      <div class="flex justify-between items-start gap-4 p-6 border-b border-stone-200 dark:border-stone-700">
+        <div>
+          <h3 id="modalTitle" class="text-2xl font-bold"></h3>
+          <p id="modalSubtitle" class="text-sm text-stone-500"></p>
+        </div>
+        <button id="modalClose" class="rounded-xl border border-stone-200 dark:border-stone-700 px-3 py-1.5">Fermer ✕</button>
+      </div>
+      <div class="p-6 grid md:grid-cols-2 gap-6">
+        <div>
+          <img id="modalImage" class="w-full h-56 object-cover rounded-2xl ring-1 ring-stone-200 dark:ring-stone-700" alt="Photo de la recette" />
+          <dl class="mt-4 grid grid-cols-3 gap-3 text-center">
+            <div class="rounded-xl border border-stone-200 dark:border-stone-700 p-3">
+              <dt class="text-xs text-stone-500">Temps</dt>
+              <dd id="modalTime" class="font-semibold"></dd>
+            </div>
+            <div class="rounded-xl border border-stone-200 dark:border-stone-700 p-3">
+              <dt class="text-xs text-stone-500">Épices</dt>
+              <dd id="modalSpice" class="font-semibold"></dd>
+            </div>
+            <div class="rounded-xl border border-stone-200 dark:border-stone-700 p-3">
+              <dt class="text-xs text-stone-500">Style</dt>
+              <dd id="modalStyle" class="font-semibold"></dd>
+            </div>
+          </dl>
+        </div>
+        <div>
+          <h4 class="font-semibold">Profil de saveurs</h4>
+          <canvas id="flavorChart" class="mt-3"></canvas>
+          <h4 class="mt-6 font-semibold">Ingrédients (indicatifs)</h4>
+          <ul id="modalIngredients" class="mt-2 grid grid-cols-2 gap-x-6 gap-y-1 text-sm list-disc list-inside"></ul>
+          <h4 class="mt-6 font-semibold">Étapes</h4>
+          <ol id="modalSteps" class="mt-2 space-y-2 text-sm list-decimal list-inside"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Créateur de marinade -->
+  <section id="marinade" class="py-16 sm:py-20 bg-gradient-to-b from-white to-brand-50/50 dark:from-stone-900 dark:to-stone-800/40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-10 items-start">
+        <div>
+          <h2 class="text-3xl font-extrabold tracking-tight">Créez votre marinade</h2>
+          <p class="text-stone-600 dark:text-stone-300">Choisissez une base, les arômes et obtenez des quantités exactes selon le poids de votre poulet.</p>
+          <form id="marinadeForm" class="mt-6 space-y-6">
+            <div>
+              <label class="text-sm font-medium">Poids de poulet (g)</label>
+              <input id="mWeight" type="number" value="800" min="200" step="50" class="mt-2 w-full rounded-2xl border border-stone-300 dark:border-stone-700 bg-white/70 dark:bg-stone-900/60 px-4 py-2.5" required>
+            </div>
+            <div>
+              <label class="text-sm font-medium">Base</label>
+              <div class="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <label class="rounded-2xl border border-stone-300 dark:border-stone-700 px-4 py-3 flex items-center gap-2">
+                  <input type="radio" name="base" value="yaourt" checked>
+                  Yaourt
+                </label>
+                <label class="rounded-2xl border border-stone-300 dark:border-stone-700 px-4 py-3 flex items-center gap-2">
+                  <input type="radio" name="base" value="citron">
+                  Citron
+                </label>
+                <label class="rounded-2xl border border-stone-300 dark:border-stone-700 px-4 py-3 flex items-center gap-2">
+                  <input type="radio" name="base" value="soja">
+                  Sauce soja
+                </label>
+                <label class="rounded-2xl border border-stone-300 dark:border-stone-700 px-4 py-3 flex items-center gap-2">
+                  <input type="radio" name="base" value="huile">
+                  Huile d'olive
+                </label>
+              </div>
+            </div>
+            <div>
+              <label class="text-sm font-medium">Arômes</label>
+              <div class="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                <label class="inline-flex items-center gap-2"><input type="checkbox" value="ail" checked> Ail</label>
+                <label class="inline-flex items-center gap-2"><input type="checkbox" value="gingembre" checked> Gingembre</label>
+                <label class="inline-flex items-center gap-2"><input type="checkbox" value="paprika"> Paprika</label>
+                <label class="inline-flex items-center gap-2"><input type="checkbox" value="piment"> Piment</label>
+                <label class="inline-flex items-center gap-2"><input type="checkbox" value="miel"> Miel</label>
+                <label class="inline-flex items-center gap-2"><input type="checkbox" value="herbes"> Herbes</label>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+              <label class="block text-sm">Intensité des épices
+                <input id="mSpice" type="range" min="0" max="10" step="1" value="5" class="w-full">
+              </label>
+              <label class="block text-sm">Sucre (balance caramélisation)
+                <input id="mSugar" type="range" min="0" max="5" step="1" value="1" class="w-full">
+              </label>
+              <label class="block text-sm">Sel (% du poids)
+                <input id="mSalt" type="range" min="1" max="2.5" step="0.1" value="1.8" class="w-full">
+              </label>
+            </div>
+            <div class="flex flex-wrap gap-3">
+              <button id="mCompute" type="button" class="rounded-2xl bg-brand-600 text-white px-5 py-3 hover:bg-brand-700">Calculer</button>
+              <button id="mCopy" type="button" class="rounded-2xl border border-stone-300 dark:border-stone-700 px-5 py-3">Copier la recette</button>
+            </div>
+          </form>
+        </div>
+        <div class="rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-soft bg-white/70 dark:bg-stone-900/60">
+          <h3 class="text-xl font-bold">Votre marinade</h3>
+          <p class="text-sm text-stone-500">Ratios pensés pour enrober sans saturer (≈10% du poids de viande).</p>
+          <div id="marinadeResult" class="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Quantités dynamiques -->
+          </div>
+          <div class="mt-6">
+            <h4 class="font-semibold">Instructions</h4>
+            <ol id="marinadeSteps" class="mt-2 space-y-2 text-sm list-decimal list-inside">
+              <!-- Étapes dynamiques -->
+            </ol>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Minuteurs de cuisson -->
+  <section id="timers" class="py-16 sm:py-20">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-end justify-between gap-6 flex-wrap">
+        <div>
+          <h2 class="text-3xl font-extrabold tracking-tight">Minuteurs de cuisson</h2>
+          <p class="text-stone-600 dark:text-stone-300">Sélectionnez la méthode et laissez-vous guider. Température cœur visée : 74°C.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 grid md:grid-cols-3 gap-6">
+        <!-- Four -->
+        <div class="rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-soft bg-white/70 dark:bg-stone-900/60">
+          <h3 class="font-semibold text-lg">Four</h3>
+          <p class="text-sm text-stone-500">Cuisses / hauts de cuisse — 200°C</p>
+          <div class="mt-3 flex items-center gap-3">
+            <input id="ovMin" type="number" value="35" min="10" class="w-24 rounded-xl border border-stone-300 dark:border-stone-700 px-3 py-2"> min
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button data-timer="oven" class="timerStart rounded-xl bg-brand-600 text-white px-4 py-2">Démarrer</button>
+            <button data-timer="oven" class="timerPause rounded-xl border border-stone-300 dark:border-stone-700 px-4 py-2">Pause</button>
+            <button data-timer="oven" class="timerReset rounded-xl border border-stone-300 dark:border-stone-700 px-4 py-2">Réinitialiser</button>
+          </div>
+          <div class="mt-4 text-3xl font-extrabold tabular-nums" id="ovDisp">00:35</div>
+        </div>
+        <!-- Poêle -->
+        <div class="rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-soft bg-white/70 dark:bg-stone-900/60">
+          <h3 class="font-semibold text-lg">Poêle</h3>
+          <p class="text-sm text-stone-500">Blancs de poulet — feu moyen</p>
+          <div class="mt-3 flex items-center gap-3">
+            <input id="panMin" type="number" value="12" min="5" class="w-24 rounded-xl border border-stone-300 dark:border-stone-700 px-3 py-2"> min
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button data-timer="pan" class="timerStart rounded-xl bg-brand-600 text-white px-4 py-2">Démarrer</button>
+            <button data-timer="pan" class="timerPause rounded-xl border border-stone-300 dark:border-stone-700 px-4 py-2">Pause</button>
+            <button data-timer="pan" class="timerReset rounded-xl border border-stone-300 dark:border-stone-700 px-4 py-2">Réinitialiser</button>
+          </div>
+          <div class="mt-4 text-3xl font-extrabold tabular-nums" id="panDisp">00:12</div>
+        </div>
+        <!-- Grill/BBQ -->
+        <div class="rounded-3xl border border-stone-200 dark:border-stone-700 p-6 shadow-soft bg-white/70 dark:bg-stone-900/60">
+          <h3 class="font-semibold text-lg">Grill / BBQ</h3>
+          <p class="text-sm text-stone-500">Pilons / brochettes — braises moyennes</p>
+          <div class="mt-3 flex items-center gap-3">
+            <input id="grillMin" type="number" value="20" min="8" class="w-24 rounded-xl border border-stone-300 dark:border-stone-700 px-3 py-2"> min
+          </div>
+          <div class="mt-4 flex gap-2">
+            <button data-timer="grill" class="timerStart rounded-xl bg-brand-600 text-white px-4 py-2">Démarrer</button>
+            <button data-timer="grill" class="timerPause rounded-xl border border-stone-300 dark:border-stone-700 px-4 py-2">Pause</button>
+            <button data-timer="grill" class="timerReset rounded-xl border border-stone-300 dark:border-stone-700 px-4 py-2">Réinitialiser</button>
+          </div>
+          <div class="mt-4 text-3xl font-extrabold tabular-nums" id="grillDisp">00:20</div>
+        </div>
+      </div>
+
+      <p class="mt-6 text-xs text-stone-500">Conseil sécurité : utilisez un thermomètre alimentaire et visez 74°C au cœur pour une consommation sûre.</p>
+    </div>
+  </section>
+
+  <!-- À propos -->
+  <section id="apropos" class="py-16 sm:py-20 border-t border-stone-200/70 dark:border-stone-700/60">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid md:grid-cols-2 gap-10 items-center">
+      <div>
+        <h2 class="text-3xl font-extrabold tracking-tight">À propos</h2>
+        <p class="mt-3 text-stone-600 dark:text-stone-300">Ce site statique est 100% côté client : idéal pour un hébergement sur AWS S3/CloudFront ou Amplify. Aucun backend requis.</p>
+        <ul class="mt-4 text-sm list-disc list-inside text-stone-600 dark:text-stone-300">
+          <li>Filtrage instantané des recettes</li>
+          <li>Profils de saveurs avec graphique interactif</li>
+          <li>Créateur de marinade avec quantités calculées</li>
+          <li>Minuteurs de cuisson multi-méthodes</li>
+          <li>Mode clair/sombre mémorisé</li>
+        </ul>
+      </div>
+      <div class="rounded-3xl overflow-hidden ring-1 ring-stone-200 dark:ring-stone-700 shadow-soft">
+        <img src="https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1600&auto=format&fit=crop" alt="Poulet rôti" class="w-full h-full object-cover"/>
+      </div>
+    </div>
+  </section>
+
+  <footer class="py-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-500">
+      <p>© <span id="year"></span> Cuisine du Poulet. Tous droits réservés.</p>
+      <a class="hover:text-brand-600" href="#top">Haut de page ↑</a>
+    </div>
+  </footer>
+
+  <script>
+    // --- Données des recettes ---
+    const RECIPES = [
+      {
+        id: 'tikka',
+        name: 'Poulet Tikka Masala',
+        country: 'Inde',
+        style: 'Curry',
+        time: 40,
+        spice: 6,
+        image: 'https://images.unsplash.com/photo-1596797038530-2c107229f5d7?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 3, Piquant: 6, Salé: 4, Acide: 3, Umami: 7 },
+        ingredients: ['Poulet', 'Yaourt', 'Garam masala', 'Tomate', 'Ail', 'Gingembre'],
+        steps: ['Mariner le poulet 1h', 'Saisir puis mijoter sauce tomate', 'Ajouter crème et servir']
+      },
+      {
+        id: 'yakitori',
+        name: 'Yakitori',
+        country: 'Japon',
+        style: 'Grillades',
+        time: 25,
+        spice: 2,
+        image: 'https://images.unsplash.com/photo-1478147427282-58a87a120781?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 4, Piquant: 1, Salé: 6, Acide: 2, Umami: 8 },
+        ingredients: ['Poulet', 'Sauce soja', 'Mirin', 'Sucre', 'Ciboule'],
+        steps: ['Préparer la sauce tare', 'Enfiler sur brochettes', 'Griller et laquer']
+      },
+      {
+        id: 'peri',
+        name: 'Peri-Peri',
+        country: 'Mozambique',
+        style: 'Grillades',
+        time: 35,
+        spice: 8,
+        image: 'https://images.unsplash.com/photo-1615937691194-97dbd3f30b2f?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 2, Piquant: 8, Salé: 5, Acide: 4, Umami: 6 },
+        ingredients: ['Poulet', 'Piment', 'Ail', 'Citron', 'Paprika fumé'],
+        steps: ['Mixer marinade piri-piri', 'Mariner 2h', 'Griller']
+      },
+      {
+        id: 'butter',
+        name: 'Butter Chicken',
+        country: 'Inde',
+        style: 'Curry',
+        time: 30,
+        spice: 3,
+        image: 'https://images.unsplash.com/photo-1625944528145-692d3e03f9ea?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 5, Piquant: 3, Salé: 4, Acide: 2, Umami: 7 },
+        ingredients: ['Poulet', 'Beurre', 'Crème', 'Tomate', 'Garam masala'],
+        steps: ['Saisir le poulet', 'Mijoter sauce tomate/beurre', 'Crémer et servir']
+      },
+      {
+        id: 'cesar',
+        name: 'Salade César au poulet',
+        country: 'États-Unis',
+        style: 'Salade',
+        time: 20,
+        spice: 1,
+        image: 'https://images.unsplash.com/photo-1551183053-bf91a1d81141?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 2, Piquant: 0, Salé: 5, Acide: 3, Umami: 6 },
+        ingredients: ['Poulet', 'Laitue romaine', 'Croutons', 'Parmesan', 'Anchois'],
+        steps: ['Griller le poulet', 'Préparer la sauce', 'Assembler la salade']
+      },
+      {
+        id: 'yassa',
+        name: 'Poulet Yassa',
+        country: 'Sénégal',
+        style: 'Rôti',
+        time: 50,
+        spice: 4,
+        image: 'https://images.unsplash.com/photo-1487376318617-f43c7b41e2e2?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 3, Piquant: 4, Salé: 5, Acide: 6, Umami: 5 },
+        ingredients: ['Poulet', 'Oignons', 'Moutarde', 'Citron', 'Piment'],
+        steps: ['Mariner aux oignons/citron', 'Saisir', 'Rôtir avec marinade']
+      },
+      {
+        id: 'fried',
+        name: 'Fried Chicken',
+        country: 'États-Unis',
+        style: 'Frit',
+        time: 30,
+        spice: 3,
+        image: 'https://images.unsplash.com/photo-1544025162-d76694265947?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 2, Piquant: 3, Salé: 7, Acide: 1, Umami: 6 },
+        ingredients: ['Poulet', 'Babeurre', 'Farine', 'Paprika', 'Poivre'],
+        steps: ['Mariner au babeurre', 'Paner', 'Frire à 175°C']
+      },
+      {
+        id: 'shawarma',
+        name: 'Shawarma de poulet',
+        country: 'Liban',
+        style: 'Street food',
+        time: 45,
+        spice: 5,
+        image: 'https://images.unsplash.com/photo-1612872087720-bb876a7b8b12?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 3, Piquant: 5, Salé: 5, Acide: 4, Umami: 6 },
+        ingredients: ['Poulet', 'Yaourt', 'Citron', 'Ail', 'Épices shawarma'],
+        steps: ['Mariner 2h', 'Cuire à la broche/poêle', 'Servir en pita']
+      },
+      {
+        id: 'basquaise',
+        name: 'Poulet basquaise',
+        country: 'France',
+        style: 'Rôti',
+        time: 55,
+        spice: 2,
+        image: 'https://images.unsplash.com/photo-1604908554027-0ff1f3cec1b0?q=80&w=1500&auto=format&fit=crop',
+        flavor: { Doux: 4, Piquant: 2, Salé: 5, Acide: 3, Umami: 6 },
+        ingredients: ['Poulet', 'Poivrons', 'Tomates', 'Oignons', 'Ail'],
+        steps: ['Saisir le poulet', 'Mijoter poivrons/tomates', 'Assembler et finir']
+      }
+    ];
+
+    // Populate country filter
+    const countries = [...new Set(RECIPES.map(r => r.country))].sort();
+    const countryFilter = document.getElementById('countryFilter');
+    countries.forEach(c => { const o = document.createElement('option'); o.textContent = c; countryFilter.appendChild(o); });
+
+    // Stats
+    const avgTime = Math.round(RECIPES.reduce((a, r) => a + r.time, 0) / RECIPES.length);
+    document.getElementById('statRecettes').textContent = RECIPES.length;
+    document.getElementById('statPays').textContent = countries.length;
+    document.getElementById('statTemps').textContent = `${avgTime} min`;
+
+    // Render recipes grid
+    const grid = document.getElementById('recipesGrid');
+    const noResults = document.getElementById('noResults');
+    const filters = {
+      q: '', style: '', country: '', spiceMax: 10, fastOnly: false
+    };
+
+    function passFilters(r) {
+      if (filters.q && !r.name.toLowerCase().includes(filters.q)) return false;
+      if (filters.style && r.style !== filters.style) return false;
+      if (filters.country && r.country !== filters.country) return false;
+      if (r.spice > filters.spiceMax) return false;
+      if (filters.fastOnly && r.time > 30) return false;
+      return true;
+    }
+
+    function recipeCard(r) {
+      const el = document.createElement('article');
+      el.className = 'group rounded-3xl overflow-hidden ring-1 ring-stone-200 dark:ring-stone-700 bg-white/70 dark:bg-stone-900/60 shadow-soft hover:-translate-y-0.5 transition grid';
+      el.innerHTML = `
+        <div class="aspect-[4/3] overflow-hidden">
+          <img src="${r.image}" alt="${r.name}" class="w-full h-full object-cover group-hover:scale-[1.02] transition"/>
+        </div>
+        <div class="p-5">
+          <div class="flex items-center justify-between gap-4">
+            <h3 class="font-bold text-lg">${r.name}</h3>
+            <span class="text-xs rounded-full px-2 py-1 border border-stone-200 dark:border-stone-700">${r.country}</span>
+          </div>
+          <p class="mt-1 text-sm text-stone-600 dark:text-stone-300">${r.style} • ${r.time} min • épices ${r.spice}/10</p>
+          <div class="mt-4 flex items-center justify-between">
+            <div class="flex -space-x-1" aria-hidden="true">
+              ${Object.entries(r.flavor).map(([k,v])=>`<span title="${k}: ${v}/10" class="h-2 w-6 rounded-full bg-stone-200 dark:bg-stone-700"><span style="width:${v*10}%" class="block h-2 rounded-full bg-brand-500"></span></span>`).join('')}
+            </div>
+            <button data-id="${r.id}" class="openModal rounded-xl border border-stone-300 dark:border-stone-700 px-3 py-1.5 hover:bg-stone-50 dark:hover:bg-stone-800">Détails</button>
+          </div>
+        </div>`;
+      return el;
+    }
+
+    function render() {
+      grid.innerHTML = '';
+      const items = RECIPES.filter(passFilters);
+      if (!items.length) { noResults.classList.remove('hidden'); return; } else { noResults.classList.add('hidden'); }
+      items.forEach(r => grid.appendChild(recipeCard(r)));
+      document.querySelectorAll('.openModal').forEach(btn => btn.addEventListener('click', () => openModal(btn.dataset.id)));
+    }
+
+    // Bind filters
+    document.getElementById('searchInput').addEventListener('input', e => { filters.q = e.target.value.trim().toLowerCase(); render(); });
+    document.getElementById('styleFilter').addEventListener('change', e => { filters.style = e.target.value; render(); });
+    countryFilter.addEventListener('change', e => { filters.country = e.target.value; render(); });
+    const spiceRange = document.getElementById('spiceRange');
+    const spiceValue = document.getElementById('spiceValue');
+    spiceRange.addEventListener('input', e => { filters.spiceMax = +e.target.value; spiceValue.textContent = `≤ ${e.target.value}`; render(); });
+    document.getElementById('fastOnly').addEventListener('change', e => { filters.fastOnly = e.target.checked; render(); });
+
+    render();
+
+    // --- Modale recette & graphique ---
+    const modal = document.getElementById('recipeModal');
+    const modalClose = document.getElementById('modalClose');
+    let flavorChart;
+
+    function openModal(id) {
+      const r = RECIPES.find(x => x.id === id);
+      if (!r) return;
+      document.getElementById('modalTitle').textContent = r.name;
+      document.getElementById('modalSubtitle').textContent = `${r.country} • ${r.style}`;
+      document.getElementById('modalImage').src = r.image;
+      document.getElementById('modalTime').textContent = `${r.time} min`;
+      document.getElementById('modalSpice').textContent = `${r.spice}/10`;
+      document.getElementById('modalStyle').textContent = r.style;
+      const ing = document.getElementById('modalIngredients');
+      ing.innerHTML = r.ingredients.map(i => `<li>${i}</li>`).join('');
+      const steps = document.getElementById('modalSteps');
+      steps.innerHTML = r.steps.map(s => `<li>${s}</li>`).join('');
+
+      const ctx = document.getElementById('flavorChart');
+      const labels = Object.keys(r.flavor);
+      const data = Object.values(r.flavor);
+      if (flavorChart) flavorChart.destroy();
+      flavorChart = new Chart(ctx, {
+        type: 'radar',
+        data: { labels, datasets: [{ label: 'Profil', data, fill: true }] },
+        options: {
+          responsive: true,
+          scales: { r: { beginAtZero: true, max: 10, ticks: { display: false } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    modalClose.addEventListener('click', () => { modal.classList.add('hidden'); modal.classList.remove('flex'); });
+    modal.addEventListener('click', (e) => { if (e.target === modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); } });
+
+    // --- Chart héro ---
+    new Chart(document.getElementById('heroChart'), {
+      type: 'radar',
+      data: { labels: ['Doux','Piquant','Salé','Acide','Umami'], datasets: [{ data: [4,5,5,3,7], fill: true }] },
+      options: { responsive: true, scales: { r: { beginAtZero: true, max: 10, ticks: { display:false } } }, plugins: { legend: { display:false } } }
+    });
+
+    // --- Créateur de marinade ---
+    const mForm = document.getElementById('marinadeForm');
+    const mResult = document.getElementById('marinadeResult');
+    const mSteps = document.getElementById('marinadeSteps');
+
+    function computeMarinade() {
+      const weight = +document.getElementById('mWeight').value || 800;
+      const base = mForm.base.value; // yaourt | citron | soja | huile
+      const aromas = Array.from(mForm.querySelectorAll('input[type=checkbox]:checked')).map(x => x.value);
+      const spice = +document.getElementById('mSpice').value;
+      const sugar = +document.getElementById('mSugar').value;
+      const saltPct = +document.getElementById('mSalt').value;
+
+      const total = Math.round(weight * 0.10); // 10% du poids
+      // Ratios de base selon le support
+      const baseRatios = {
+        yaourt: { base: 0.65, acide: 0.10 },
+        citron: { base: 0.55, acide: 0.20 },
+        soja:   { base: 0.60, acide: 0.05 },
+        huile:  { base: 0.70, acide: 0.05 }
+      }[base];
+
+      const salt = Math.round(weight * (saltPct/100));
+      const sweet = Math.round(total * (sugar/100));
+      const spices = Math.round(total * (Math.min(5 + spice, 12) / 100));
+      const baseG = Math.max(0, Math.round(total * baseRatios.base) - sweet - spices);
+      const acidG = Math.round(total * baseRatios.acide);
+      const aromes = aromas.join(', ') || '—';
+
+      mResult.innerHTML = `
+        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+          <p class="text-sm text-stone-500">Base</p>
+          <p class="text-lg font-semibold">${base === 'yaourt' ? 'Yaourt nature' : base === 'citron' ? 'Jus de citron' : base === 'soja' ? 'Sauce soja' : "Huile d'olive"} — <span class="text-brand-600">${baseG} g</span></p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+          <p class="text-sm text-stone-500">Acidité</p>
+          <p class="text-lg font-semibold">${base === 'yaourt' ? 'Jus de citron' : 'Vinaigre de riz'} — <span class="text-brand-600">${acidG} g</span></p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+          <p class="text-sm text-stone-500">Sel</p>
+          <p class="text-lg font-semibold">Sel fin — <span class="text-brand-600">${salt} g</span> <span class="text-xs text-stone-500">(${saltPct}% du poids)</span></p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+          <p class="text-sm text-stone-500">Sucre</p>
+          <p class="text-lg font-semibold">Miel / sucre — <span class="text-brand-600">${sweet} g</span></p>
+        </div>
+        <div class="rounded-2xl border border-stone-200 dark:border-stone-700 p-4">
+          <p class="text-sm text-stone-500">Épices & arômes</p>
+          <p class="text-lg font-semibold">${aromes} — <span class="text-brand-600">${spices} g</span></p>
+        </div>`;
+
+      mSteps.innerHTML = [
+        `Mélanger la base avec l'acidité, le sel et le sucre jusqu'à dissolution.`,
+        `Incorporer les épices/arômes : ${aromes}.`,
+        `Ajouter le poulet (${weight} g), enrober, filmer et réserver au frais 1–12 h.`,
+        `Égoutter l'excédent avant cuisson (évite de brûler).`
+      ].map(s => `<li>${s}</li>`).join('');
+
+      return {
+        text: `Marinade (${total} g) — base: ${baseG} g, acide: ${acidG} g, sel: ${salt} g, sucre: ${sweet} g, épices: ${spices} g. Arômes: ${aromes}.`
+      }
+    }
+
+    document.getElementById('mCompute').addEventListener('click', computeMarinade);
+    document.getElementById('mCopy').addEventListener('click', async () => {
+      const { text } = computeMarinade();
+      try { await navigator.clipboard.writeText(text); alert('Recette copiée dans le presse-papiers !'); } catch { alert('Copie impossible dans ce navigateur.'); }
+    });
+    // Calcul initial
+    computeMarinade();
+
+    // --- Minuteurs ---
+    const timers = {
+      oven: { input: document.getElementById('ovMin'), disp: document.getElementById('ovDisp'), t: null, left: 35*60 },
+      pan:  { input: document.getElementById('panMin'), disp: document.getElementById('panDisp'), t: null, left: 12*60 },
+      grill:{ input: document.getElementById('grillMin'), disp: document.getElementById('grillDisp'), t: null, left: 20*60 }
+    };
+
+    function fmt(s) { const m = Math.floor(s/60).toString().padStart(2,'0'); const ss = Math.floor(s%60).toString().padStart(2,'0'); return `${m}:${ss}`; }
+
+    function resetTimer(key) {
+      const base = +timers[key].input.value * 60;
+      timers[key].left = base; timers[key].disp.textContent = fmt(base);
+      if (timers[key].t) { clearInterval(timers[key].t); timers[key].t = null; }
+    }
+
+    Object.keys(timers).forEach(k => {
+      resetTimer(k);
+      timers[k].input.addEventListener('input', () => resetTimer(k));
+    });
+
+    function startTimer(key) {
+      if (timers[key].t) return;
+      timers[key].t = setInterval(() => {
+        timers[key].left -= 1; timers[key].disp.textContent = fmt(Math.max(0, timers[key].left));
+        if (timers[key].left <= 0) { clearInterval(timers[key].t); timers[key].t = null; beep(); alert(`Terminé (${key}) !`); }
+      }, 1000);
+    }
+
+    function pauseTimer(key) { if (timers[key].t) { clearInterval(timers[key].t); timers[key].t = null; } }
+
+    function beep() {
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = ctx.createOscillator(); const g = ctx.createGain();
+        o.type = 'sine'; o.frequency.value = 880; o.connect(g); g.connect(ctx.destination);
+        o.start(); g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.0); setTimeout(()=>o.stop(), 1000);
+      } catch {}
+    }
+
+    document.querySelectorAll('.timerStart').forEach(b=>b.addEventListener('click', ()=> startTimer(b.dataset.timer)));
+    document.querySelectorAll('.timerPause').forEach(b=>b.addEventListener('click', ()=> pauseTimer(b.dataset.timer)));
+    document.querySelectorAll('.timerReset').forEach(b=>b.addEventListener('click', ()=> resetTimer(b.dataset.timer)));
+
+    // --- Thème & utilitaires ---
+    const themeEmoji = document.getElementById('themeEmoji');
+    function applyTheme() {
+      const dark = localStorage.getItem('theme') === 'dark';
+      document.documentElement.classList.toggle('dark', dark);
+      themeEmoji.textContent = dark ? '🌙' : '🌞';
+    }
+    document.getElementById('darkToggle').addEventListener('click', () => {
+      const cur = localStorage.getItem('theme') || 'light';
+      localStorage.setItem('theme', cur === 'light' ? 'dark' : 'light');
+      applyTheme();
+    });
+    applyTheme();
+
+    // Mobile nav
+    const menuBtn = document.getElementById('menuBtn');
+    const mobileNav = document.getElementById('mobileNav');
+    menuBtn.addEventListener('click', ()=> mobileNav.classList.toggle('hidden'));
+
+    // Footer year
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
