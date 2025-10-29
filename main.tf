@@ -19,6 +19,7 @@ provider "aws" {
 
 resource "aws_s3_bucket" "example" {
   bucket = "volume1-persistant-memory-storage"
+  force_destroy = true
 
 #   tags = {
 #     Name        = "Cat-BDD"
@@ -26,18 +27,23 @@ resource "aws_s3_bucket" "example" {
 #   }
 }
 
-resource "aws_s3_bucket_website_configuration" "website_config" {
+resource "aws_s3_bucket_website_configuration" "example" {
   bucket = aws_s3_bucket.example.id
 
   index_document {
-    suffix = "./assets/cuisine_du_poulet_site_interactif_aws_ready.html"
-  }
-
-  error_document {
-    key = "./assets/error.txt"
+    suffix = "index.html"
   }
 }
 
+resource "aws_s3_object" "cacapipiboudin" {
+  bucket = aws_s3_bucket.example.id
+  key = "index.html"
+  source = "./assets/cuisine_du_poulet_site_interactif_aws_ready.html"
+  # content = "text/html"
+  # acl = "public-read"
+}
+
+
 output "site_web_url" {
-  value = aws_s3_bucket_website_configuration.website_config.website_endpoint
+  value = aws_s3_bucket_website_configuration.example.website_endpoint
 }
