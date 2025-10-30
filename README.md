@@ -48,6 +48,8 @@ resultat :
 
 - Ajout de notification mail jenkins avec l'url du site
 
+-ajout d'un ALB (amazon load balancer)
+
 # Miscellaneous
 
 
